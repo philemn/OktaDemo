@@ -1,0 +1,616 @@
+﻿@using System.Text.Json
+@model StatisticsModel
+
+@{
+    ViewData["Title"] = "Home Page";
+    if (Model == null) { return; }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Dashboard</h1>
+    <p>Demonstrating the power and simplicity of <a href="https://okta.com">Okta</a>.</p>
+</div>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card" id="eventsToday">
+                <div class="card-header p-3 pt-2">
+                    <div
+                        class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="material-icons opacity-10">weekend</i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Today's Events</p>
+                        <h4 v-if="loading" class="mb-0">
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                        </h4>
+                        <h4 v-else v-cloak class="mb-0">{{ events }}</h4>
+                    </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                    <div v-if="loading">
+                        <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">&nbsp;</span>&nbsp;</p>
+                    </div>
+                    <div v-else v-cloak>
+                        <p v-if="change < 0" class="mb-0"><span class="text-danger text-sm font-weight-bolder">&ndash;{{ 0 - change }}%</span> since yesterday</p>
+                        <p v-if="change === 0" class="mb-0"><span class="text-sm">No change</p>
+                        <p v-if="change > 0" class="mb-0"><span class="text-success text-sm font-weight-bolder">+{{ change }}%</span> since yesterday</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card" id="sessionsToday">
+                <div class="card-header p-3 pt-2">
+                    <div
+                        class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="material-icons opacity-10">person</i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Today's Sessions</p>
+                        <h4 v-if="loading" class="mb-0">
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                        </h4>
+                        <h4 v-else v-cloak class="mb-0">{{ sessions }}</h4>
+                    </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                    <div v-if="loading">
+                        <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">&nbsp;</span>&nbsp;</p>
+                    </div>
+                    <div v-else v-cloak>
+                        <p v-if="change < 0" class="mb-0"><span class="text-danger text-sm font-weight-bolder">&ndash;{{ 0 - change }}%</span> since yesterday</p>
+                        <p v-if="change === 0" class="mb-0"><span class="text-sm">No change</p>
+                        <p v-if="change > 0" class="mb-0"><span class="text-success text-sm font-weight-bolder">+{{ change }}%</span> since yesterday</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card" id="dashboardUsers">
+                <div class="card-header p-3 pt-2">
+                    <div
+                        class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="material-icons opacity-10">person</i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Dashboard Users</p>
+                        <h4 v-if="loading" class="mb-0">
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                        </h4>
+                        <h4 v-else v-cloak class="mb-0">{{ users }}</h4>
+                    </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                    <div v-if="loading">
+                        <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">&nbsp;</span>&nbsp;</p>
+                    </div>
+                    <div v-else v-cloak>
+                        <p v-if="change < 0" class="mb-0"><span class="text-danger text-sm font-weight-bolder">&ndash;{{ 0 - change }}</span> since last update</p>
+                        <p v-if="change === 0" class="mb-0"><span class="text-sm">No change</p>
+                        <p v-if="change > 0" class="mb-0"><span class="text-success text-sm font-weight-bolder">+{{ change }}</span> since last update</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6">
+            <div class="card" id="failuresToday">
+                <div class="card-header p-3 pt-2">
+                    <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
+                        <i class="material-icons opacity-10">weekend</i>
+                    </div>
+                    <div class="text-end pt-1">
+                        <p class="text-sm mb-0 text-capitalize">Today's Failures</p>
+                        <h4 v-if="loading" class="mb-0">
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                            <span v-if="loading" class="spinner-grow spinner-grow-sm" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </span>
+                        </h4>
+                        <h4 v-else v-cloak class="mb-0">{{ failures }}</h4>
+                    </div>
+                </div>
+                <hr class="dark horizontal my-0">
+                <div class="card-footer p-3">
+                    <div v-if="loading">
+                        <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">&nbsp;</span>&nbsp;</p>
+                    </div>
+                    <div v-else v-cloak>
+                        <p v-if="change < 0" class="mb-0"><span class="text-success text-sm font-weight-bolder">&ndash;{{ 0 - change }}%</span> since yesterday</p>
+                        <p v-if="change === 0" class="mb-0"><span class="text-sm">No change</p>
+                        <p v-if="change > 0" class="mb-0"><span class="text-danger text-sm font-weight-bolder">+{{ change }}%</span> since yesterday</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-lg-6 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                            <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-0 ">Sessions</h6>
+                    <p class="text-sm ">New user sessions by day</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2  ">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                            <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-0 ">Events</h6>
+                    <p class="text-sm ">Events by day</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <div class="col-lg-12 mt-4 mb-3">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mt-4 mx-3 z-index-2 bg-transparent">
+                    <div class="chart">
+                        <canvas id="activityMap" class="chart-canvas"></canvas>
+                        @* <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas> *@
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-0 ">Activity Map</h6>
+                    <p class="text-sm ">Weekly activity by state</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
+            <div class="card" id="topActivity">
+                <div class="card-header pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-7">
+                            <h6 class="mb-0">Top Activity</h6>
+                        </div>
+                        <div class="col-lg-6 col-5 my-auto text-end">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Activity</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Count
+                                    </th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="row in activity">
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ row.item1 }}</h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <span class="text-xs font-weight-bold">{{ row.item2 }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="progress-wrapper w-75 mx-auto">
+                                            <div class="progress-info">
+                                                <div class="progress-percentage text-center">
+                                                    <span class="text-xs font-weight-bold">{{ row.item3 }}%</span>
+                                                </div>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-gradient-info" :style="{ width: row.item3 + '%' }" role="progressbar"
+                                                    aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100" id="recentActivity">
+                <div class="card-header pb-0">
+                    <h6>Recent activity</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="timeline timeline-one-side mt-1">
+                        <div v-for="item in log" class="timeline-block mb-1">
+                            <span class="timeline-step">
+                                <i class="material-icons text-dark text-gradient">code</i>
+                            </span>
+                            <div class="timeline-content">
+                                <h6 class="text-dark text-sm font-weight-bold mb-0">{{ item.item1 }}</h6>
+                                <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">{{ moment(item.item2).fromNow() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/vue/dist/vue.min.js"></script>
+<script src="https://unpkg.com/chartjs-chart-geo@3"></script>
+<script>
+(function() {
+fetch('https://unpkg.com/us-atlas/states-10m.json').then((r) => r.json()).then((us) => {
+  const nation = ChartGeo.topojson.feature(us, us.objects.nation).features[0];
+  const states = ChartGeo.topojson.feature(us, us.objects.states).features;
+
+  window.statesData = states;
+
+  const activityMap = @Html.Raw(JsonSerializer.Serialize(Model.ActivityMap, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+  let activityLookup = {};
+  activityMap.forEach((x) => activityLookup[x.item1] = x.item2);
+
+  window.activityMap = new Chart(document.getElementById("activityMap").getContext("2d"), {
+    type: 'choropleth',
+    data: {
+      labels: states.map((d) => d.properties.name),
+      datasets: [{
+        label: 'States',
+        outline: nation,
+        data: states.map((d) => ({feature: d, value: (activityLookup[d.properties.name] || 0)})),
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false
+        },
+      },
+      scales: {
+        xy: {
+          projection: 'albersUsa'  
+        },
+        color: {
+          quantize: 5,
+          legend: {
+            display: false,
+            position: 'bottom-right',
+            align: 'bottom'
+          },
+        }
+      },
+    }
+  });
+});
+})();
+</script>
+<script>
+    var ctx = document.getElementById("chart-bars").getContext("2d");
+
+    var sessionChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: @Html.Raw(JsonSerializer.Serialize(Model.SessionLabels)),
+            datasets: [{
+                label: "Sessions",
+                tension: 0.4,
+                borderWidth: 0,
+                borderRadius: 4,
+                borderSkipped: false,
+                backgroundColor: "rgba(255, 255, 255, .8)",
+                data: @Html.Raw(JsonSerializer.Serialize(Model.SessionData)),
+                maxBarThickness: 6
+            },],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [5, 5],
+                        color: 'rgba(255, 255, 255, .2)'
+                    },
+                    ticks: {
+                        suggestedMin: 0,
+                        suggestedMax: 500,
+                        beginAtZero: true,
+                        padding: 10,
+                        font: {
+                            size: 14,
+                            weight: 300,
+                            family: "Roboto",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                        color: "#fff"
+                    },
+                },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [5, 5],
+                        color: 'rgba(255, 255, 255, .2)'
+                    },
+                    ticks: {
+                        display: true,
+                        color: '#f8f9fa',
+                        padding: 10,
+                        font: {
+                            size: 14,
+                            weight: 300,
+                            family: "Roboto",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                    }
+                },
+            },
+        },
+    });
+
+
+    var ctx2 = document.getElementById("chart-line").getContext("2d");
+
+    var eventsChart = new Chart(ctx2, {
+        type: "line",
+        data: {
+            labels: @Html.Raw(JsonSerializer.Serialize(Model.EventsLabels)),
+            datasets: [{
+                label: "Events",
+                tension: 0,
+                borderWidth: 0,
+                pointRadius: 5,
+                pointBackgroundColor: "rgba(255, 255, 255, .8)",
+                pointBorderColor: "transparent",
+                borderColor: "rgba(255, 255, 255, .8)",
+                borderColor: "rgba(255, 255, 255, .8)",
+                borderWidth: 4,
+                backgroundColor: "transparent",
+                fill: true,
+                data: @Html.Raw(JsonSerializer.Serialize(Model.EventsData)),
+                maxBarThickness: 6
+
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    grid: {
+                        drawBorder: false,
+                        display: true,
+                        drawOnChartArea: true,
+                        drawTicks: false,
+                        borderDash: [5, 5],
+                        color: 'rgba(255, 255, 255, .2)'
+                    },
+                    ticks: {
+                        display: true,
+                        color: '#f8f9fa',
+                        padding: 10,
+                        font: {
+                            size: 14,
+                            weight: 300,
+                            family: "Roboto",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                    }
+                },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        display: false,
+                        drawOnChartArea: false,
+                        drawTicks: false,
+                        borderDash: [5, 5]
+                    },
+                    ticks: {
+                        display: true,
+                        color: '#f8f9fa',
+                        padding: 10,
+                        font: {
+                            size: 14,
+                            weight: 300,
+                            family: "Roboto",
+                            style: 'normal',
+                            lineHeight: 2
+                        },
+                    }
+                },
+            },
+        },
+    });
+
+    var eventsToday = new Vue({
+        el: "#eventsToday",
+        data: {
+            loading: @Model.Loading.ToString().ToLower(),
+            events: @(Model.Loading ? 1 : @Model.EventsToday),
+            change: @(Model.Loading ? 0 : @Model.EventsPercentChange)
+        }
+    });
+
+    var sessionsToday = new Vue({
+        el: "#sessionsToday",
+        data: {
+            loading: @Model.Loading.ToString().ToLower(),
+            sessions: @(Model.Loading ? 1 : @Model.SessionsToday),
+            change: @(Model.Loading ? 0 : @Model.SessionsPercentChange)
+        }
+    });
+
+    var dashboardUsers = new Vue({
+        el: "#dashboardUsers",
+        data: {
+            loading: @Model.Loading.ToString().ToLower(),
+            users: @(Model.Loading ? 1 : Model.DashboardUsers > 0 ? Model.DashboardUsers : 1),
+            change: 0
+        }
+    });
+
+    var failuresToday = new Vue({
+        el: "#failuresToday",
+        data: {
+            loading: @Model.Loading.ToString().ToLower(),
+            failures: @(Model.Loading ? 1 : @Model.FailuresToday),
+            change: @(Model.Loading ? 0 : @Model.FailuresPercentChange)
+        }
+    });
+
+    var topActivity = new Vue({
+        el: "#topActivity",
+        data: {
+            activity: @Html.Raw(JsonSerializer.Serialize(Model.TopActivity, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
+        }
+    });
+
+    var recentActivity = new Vue({
+        el: "#recentActivity",
+        data: {
+            log: @Html.Raw(JsonSerializer.Serialize(Model.RecentActivity, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }))
+        }
+    });
+
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/signalr/dashboard")
+        .withAutomaticReconnect()
+        .build();
+    var lastDashboardUsers = @Model.DashboardUsers || 1;
+    connection.on("UpdateStatistics", function(stats) {
+        console.log("Updating Statistics", stats);
+
+        sessionChart.data.datasets[0].data = stats.sessionData;
+        sessionChart.data.labels = stats.sessionLabels;
+        sessionChart.update();
+        @* console.log("- Session Chart"); *@
+
+        eventsChart.data.datasets[0].data = stats.eventsData;
+        eventsChart.data.labels = stats.eventsLabels;
+        eventsChart.update();
+        @* console.log("- Events Chart"); *@
+
+        let activityLookup = {};
+        stats.activityMap.forEach((x) => activityLookup[x.item1] = x.item2);
+        activityMap.data.datasets[0].data = statesData.map((d) => ({feature: d, value: (activityLookup[d.properties.name] || 0)}));
+        activityMap.update();
+        @* console.log("- Activity Map"); *@
+
+        @* failuresChart.data.datasets[0].data = stats.failuresData;
+        failuresChart.data.labels = stats.failuresLabels;
+        failuresChart.update();
+        console.log("- Failures Chart"); *@
+
+        eventsToday.$data.events = stats.eventsToday;
+        eventsToday.$data.change = stats.eventsPercentChange;
+        eventsToday.$data.loading = false;
+        @* console.log("- Events Today"); *@
+
+        sessionsToday.$data.sessions = stats.sessionsToday;
+        sessionsToday.$data.change = stats.sessionsPercentChange;
+        sessionsToday.$data.loading = false;
+        @* console.log("- Sessions Today"); *@
+
+        dashboardUsers.$data.users = stats.dashboardUsers;
+        dashboardUsers.$data.change = stats.dashboardUsers - lastDashboardUsers;
+        dashboardUsers.$data.loading = false;
+        @* console.log("- Dashboard Users"); *@
+
+        failuresToday.$data.failures = stats.failuresToday;
+        failuresToday.$data.change = stats.failuresPercentChange;
+        failuresToday.$data.loading = false;
+        @* console.log("- Failures Today"); *@
+
+        topActivity.$data.activity = stats.topActivity;
+        recentActivity.$data.log = stats.recentActivity;
+
+        lastDashboardUsers = stats.dashboardUsers;
+    });
+    connection.start().then(function() {
+        console.log("Connected to SignalR hub");
+    });
+</script>
+}

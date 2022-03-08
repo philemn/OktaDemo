@@ -1,0 +1,191 @@
+﻿@model ProfileModel
+
+@{
+    ViewData["Title"] = "Profile";
+    if (Model == null) { return; }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Profile</h1>
+</div>
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="page-header min-height-200 border-radius-xl mt-4"
+        style="background-image: url('https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80');">
+        <span class="mask bg-gradient-primary opacity-6"></span>
+    </div>
+    <div class="card card-body mx-3 mx-md-4 mt-n6">
+        <div class="row gx-4 mb-2">
+            <div class="col-auto">
+                <div class="avatar avatar-xl position-relative">
+                    <img src="~/assets/img/team-@(Model.EmployeeNumber).jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">
+                </div>
+            </div>
+            <div class="col-auto my-auto">
+                <div class="h-100">
+                    <h5 class="mb-1">
+                        @Model.FirstName @Model.LastName
+                    </h5>
+                    <p class="mb-0 font-weight-normal text-sm">
+                        @Model.City, @Model.State
+                    </p>
+                </div>
+            </div>
+        </div>
+        <form method="post" onsubmit="submitting()">
+            <div class="row">
+                <div class="col-12 col-xl-4">
+                    <div class="card card-plain h-100">
+                        <div class="card-header pb-0 p-3">
+                            <h6 class="mb-0">Settings</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <h6 class="text-uppercase text-body text-xs font-weight-bolder">Email</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item border-0 px-0">
+                                    <div class="form-check form-switch ps-0">
+                                        <input class="form-check-input ms-auto" type="checkbox" onchange="showSave();"
+                                            value="true"
+                                            name="emailNewsletter"
+                                            id="emailNewsletter" checked="@(Model.EmailNewsletter)">
+                                        <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0"
+                                            for="emailNewsletter">Monthly Newsletter</label>
+                                    </div>
+                                </li>
+                                <li class="list-group-item border-0 px-0">
+                                    <div class="form-check form-switch ps-0">
+                                        <input class="form-check-input ms-auto" type="checkbox" onchange="showSave();"
+                                            value="true"
+                                            name="emailUpdates"
+                                            id="emailUpdates" checked="@(Model.EmailUpdates)">
+                                        <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0"
+                                            for="emailUpdates">Account Updates</label>
+                                    </div>
+                                </li>
+                                <li class="list-group-item border-0 px-0">
+                                    <div class="form-check form-switch ps-0">
+                                        <input class="form-check-input ms-auto" type="checkbox" onchange="showSave();"
+                                            value="true"
+                                            name="emailFeatures"
+                                            id="emailFeatures" checked="@(Model.EmailFeatures)">
+                                        <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0"
+                                            for="emailFeatures">New Features / Bug Fixes</label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-4">
+                    <div class="card card-plain h-100">
+                        <div class="card-header pb-0 p-3">
+                            <div class="row">
+                                <div class="col-md-8 d-flex align-items-center">
+                                    <h6 class="mb-0">About Me</h6>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <h6 class="text-uppercase text-body text-xs font-weight-bolder">Contact Info</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                    class="text-dark">Mobile:</strong> &nbsp;
+                                    <span id="phoneNumberReadonly" style="display: inline-block; cursor: pointer;" onclick="editPhoneNumber()">
+                                    @(string.IsNullOrEmpty(Model.PhoneNumber) ? "(not available)" : Model.PhoneNumber)
+                                    </span>
+                                    <span id="phoneNumberEdit" class="input-group input-group-outline" style="width: 12em; display: none;">
+                                        <input class="form-control w-100" type="text" value="@Model.PhoneNumber" name="phoneNumber" />
+                                    </span>
+                                </li>
+                                <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                        class="text-dark">Email:</strong> &nbsp; @Model.Email</li>
+                                @if (!string.IsNullOrEmpty(Model.FacebookUrl) || !string.IsNullOrEmpty(Model.TwitterUrl))
+                                {
+                                    <li class="list-group-item border-0 ps-0 pb-0">
+                                        <strong class="text-dark text-sm">Social:</strong> &nbsp;
+                                        @if (!string.IsNullOrEmpty(Model.FacebookUrl))
+                                        {
+                                        <a class="btn btn-facebook btn-simple mb-0 ps-1 pe-2 py-0" href="@Model.FacebookUrl">
+                                            <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+                                        </a>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.TwitterUrl))
+                                        {
+                                        <a class="btn btn-twitter btn-simple mb-0 ps-1 pe-2 py-0" href="@Model.TwitterUrl">
+                                            <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+                                        </a>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.AccountManagerName))
+                {
+                    <div class="col-12 col-xl-4">
+                        <div class="card card-plain h-100">
+                            <div class="card-header pb-0 p-3">
+                                <div class="row">
+                                    <div class="col-md-8 d-flex align-items-center">
+                                        <h6 class="mb-0">Account Manager</h6>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-3">
+                                <h6 class="text-uppercase text-body text-xs font-weight-bolder">Contact Info</h6>
+                                <ul class="list-group">
+                                    <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                        class="text-dark">Name:</strong> &nbsp;
+                                        @Model.AccountManagerName
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                        class="text-dark">Mobile:</strong> &nbsp;
+                                        @(string.IsNullOrEmpty(Model.AccountManagerPhoneNumber) ? "(not available)" : Model.AccountManagerPhoneNumber)
+                                    </li>
+                                    <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                            class="text-dark">Email:</strong> &nbsp; @Model.AccountManagerEmail
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row" id="save" style="display: none;">
+                <div class="col-lg-12">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        showSave = function() {
+            document.getElementById("save").style.display = "block";
+        }
+        editPhoneNumber = function() {
+            var readonly = document.getElementById("phoneNumberReadonly");
+            var edit = document.getElementById("phoneNumberEdit");
+            readonly.style.display = "none";
+            edit.style.display = "inline-block";
+            edit.getElementsByTagName("input")[0].focus();
+
+            showSave();
+        }
+        submitting = function() {
+            let saveButton = document.getElementById("save").getElementsByTagName("button")[0];
+            saveButton.className = "btn btn-secondary";
+            saveButton.disabled = true;
+            saveButton.innerHTML =
+                "Saving &nbsp; <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>";
+        }
+    </script>
+}

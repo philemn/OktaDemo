@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    ViewData["HideSideNav"] = true;
+}
+
+<div class="text-center">
+    <p><img src="~/assets/img/logo-ct-dark.png" /></p>
+    <h1 class="display-4">@AppTemplate.ApplicationName</h1>
+    <p>Demonstrating the power and simplicity of <a href="https://okta.com">Okta</a>.</p>
+
+    <div class="mx-3">
+        <a class="btn bg-gradient-primary mt-4" asp-controller="Account" asp-action="Login">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">login</i>
+              <span class="nav-link-text ms-1">Sign In</span>
+            </div>
+            <form class="hide" asp-controller="Account" asp-action="Logout" method="post" id="logout_form"></form>
+          </a>
+      </div>
+</div>

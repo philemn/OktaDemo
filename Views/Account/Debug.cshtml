@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNetCore.Authentication
+@using Okta.Sdk;
+@using System.Text.Json
+@model IAppUser
+
+@{
+    ViewData["Title"] = "Home Page";
+    if (Model == null) { return ; }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Debug</h1>
+    <p>Here's the list of current user claims ...</p>
+</div>
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <h5>Claims</h5>
+            <ul class="fs-6">
+                @foreach (var claim in User.Claims)
+                {
+                    <li>@claim</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h5>App User</h5>
+            <pre>@JsonSerializer.Serialize(Model.Profile.GetData(), new JsonSerializerOptions { WriteIndented = true })</pre>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h5>Access Token</h5>
+            <pre>@(await Context.GetTokenAsync("access_token"))</pre>
+        </div>
+    </div>
+</div>

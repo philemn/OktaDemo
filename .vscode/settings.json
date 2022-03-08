@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/a4d3da45-0526-4410-a67e-786770008eac/resourceGroups/AwesomePortal/providers/Microsoft.Web/sites/awesomeportal",
+    "appService.deploySubpath": "publish"
+}

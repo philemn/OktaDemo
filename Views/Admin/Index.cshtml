@@ -1,0 +1,189 @@
+﻿@using Okta.Sdk
+@model AdminModel
+
+@{
+    ViewData["Title"] = "Administration";
+    var admins = Model?.Admins.ToList() ?? new List<AdminModel.User>();
+    var users = Model?.Users.ToList() ?? new List<AdminModel.User>();
+}
+
+<div class="text-center">
+    <h1 class="display-4">Administration</h1>
+    <p>You've found the place to create, view, update, and delete users.</p>
+    <p>There are @(admins.Count + users.Count) users in the system.</p>
+</div>
+
+<div class="container-fluid py-4">
+    @* <div class="row">
+        <div class="col-12">
+            <div class="card my-4">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Admins</h6>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        User</th>
+                                    <th
+                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 d-none d-sm-table-cell">
+                                        Location</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Status</th>
+                                    <th
+                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 d-none d-sm-table-cell">
+                                        Last Updated</th>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in admins.OrderBy(x => x.Name))
+                                {
+                                    await UserRow(user);
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+    <div class="row">
+        <div class="col-12">
+            <div class="card my-4">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Users</h6>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        User</th>
+                                    <th
+                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 d-none d-sm-table-cell">
+                                        Location</th>
+                                    <th
+                                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                        Status</th>
+                                    <th
+                                        class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 d-none d-sm-table-cell">
+                                        Last Updated</th>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in users)
+                                {
+                                    await UserRow(user);
+                                }
+                                @if (users.Count == 0)
+                                {
+                                    <td class="text-xs text-secondary px-4">No users exist ...</td>
+                                    <td class="d-none d-sm-table-cell"></td>
+                                    <td></td>
+                                    <td class="d-none d-sm-table-cell"></td>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a asp-action="AddUser" class="btn btn-icon btn-3 btn-success">
+        <span class="btn-inner--icon"><i class="material-icons">add</i></span>
+        <span class="btn-inner--text">New User</span>
+    </a>
+</div>
+
+@{
+    async Task UserRow(AdminModel.User user)
+    {
+        var employeeNumber = user.EmployeeNumber;
+        var name = user.Name;
+        var email = user.Email;
+        var lastUpdated = user.LastUpdated.GetValueOrDefault().ToLocalTime();
+        var lastUpdatedDate = user.LastUpdated.HasValue ? lastUpdated.ToString("d") : "Never";
+        var lastUpdatedTime = user.LastUpdated.HasValue ? lastUpdated.ToString("t") : "";
+        var statusClass = user.Status == UserStatus.Active
+        ? "badge badge-sm bg-gradient-success"
+        : "badge badge-sm bg-gradient-secondary";
+
+        <tr>
+            <td>
+                <div class="d-flex px-3 py-1">
+                    <div class="d-none d-sm-block">
+                        <img src="~/assets/img/team-@(user.ProfileId).jpg" class="avatar avatar-sm me-3 border-radius-lg"
+                    alt="@name Profile Pic">
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm"><a asp-action="Users" asp-route-id="@user.Id">@name</a></h6>
+                        <p class="text-xs text-secondary mb-0">@email</p>
+                    </div>
+                </div>
+            </td>
+            <td class="d-none d-sm-table-cell">
+                <p class="text-xs font-weight-bold mb-0">@user.State</p>
+                <p class="text-xs text-secondary mb-0">@user.City</p>
+            </td>
+            <td class="align-middle text-center text-sm">
+                <span class="@statusClass">@user.Status</span>
+            </td>
+            <td class="d-none d-sm-table-cell">
+                <p class="text-xs font-weight-bold mb-0">@lastUpdatedDate</p>
+                <p class="text-xs text-secondary mb-0">@lastUpdatedTime</p>
+            </td>
+            @* <td class="align-middle">
+                @if (!user.IsCurrentUser)
+                {
+                <a asp-action="EditUser" asp-route-id="@user.Id" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                    data-original-title="Edit user">
+                    <i class="material-icons opacity-10">edit</i>
+                </a>
+                <a href="javascript:;" class="text-secondary font-weight-bold text-xs px-3" data-toggle="tooltip"
+                    data-original-title="Delete user"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal-@(user.Id)">
+                    <i class="material-icons opacity-10">delete</i>
+                </a>
+                <!-- Modal -->
+                <div class="modal fade" id="deleteModal-@user.Id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title font-weight-normal">Are you sure?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Removing a user cannot be undone.
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post" asp-action="RemoveUser">
+                                    @Html.Hidden("id", user.Id)
+                                    <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn bg-gradient-primary">Remove</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+                else
+                {
+                    <span class="text-xxs text-center">Current User</span>
+                }
+            </td> *@
+        </tr>
+    }
+}

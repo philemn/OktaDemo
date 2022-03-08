@@ -1,0 +1,137 @@
+﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
+@{
+    ViewData["Title"] = "Add User";
+
+    var isLastNameValid = ViewContext.ModelState["firstName"]?.ValidationState != ModelValidationState.Invalid;
+
+    string GetInputGroupClass(string fieldName)
+    {
+        var modelState = ViewContext.ModelState[fieldName];
+
+        if (modelState != null)
+        {
+            var isValid = modelState.ValidationState != ModelValidationState.Invalid;
+            var isFilled = modelState.AttemptedValue != null;
+
+            return isValid
+                ? "input-group input-group-outline mb-4 is-valid" + (isFilled ? " is-filled" : "")
+                : "input-group input-group-outline mb-4 is-invalid" + (isFilled ? " is-filled" : "");
+        }
+
+        return "input-group input-group-outline mb-4";
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Add User</h1>
+
+    @if (ViewContext.ModelState.ContainsKey(""))
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewContext.ModelState[""]?.Errors.First().ErrorMessage
+        </div>
+    }
+</div>
+
+<div class="container-fluid px-2 px-md-4">
+    <div class="card card-body mx-3 mx-md-4">
+        <div class="row">
+            <h5 class="mb-3">
+                Attributes
+            </h5>
+        </div>
+        <form method="post" onsubmit="submitting()">
+            <div class="row gx-4 mb-2">
+                <div class="col-auto my-auto">
+                    <div class="h-100">
+                        <div class="@GetInputGroupClass("firstName")">
+                            <label class="form-label">First Name</label>
+                            @Html.TextBox("firstName", "", null, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto my-auto">
+                    <div class="h-100">
+                        <div class="@GetInputGroupClass("lastName")">
+                            <label class="form-label">Last Name</label>
+                            @Html.TextBox("lastName", "", null, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-4 mb-2">
+                <div class="col-auto my-auto">
+                    <div class="h-100">
+                        <div class="@GetInputGroupClass("city")">
+                            <label class="form-label">City</label>
+                            @Html.TextBox("city", "", null, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto my-auto">
+                    <div class="h-100">
+                        <div class="@GetInputGroupClass("state")">
+                            <label class="form-label">State</label>
+                            @Html.TextBox("state", "", null, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-4 mb-2">
+                <div class="col-md-3 col-8 my-auto">
+                    <div class="h-100">
+                        <div class="@GetInputGroupClass("email")">
+                            <label class="form-label">Email Address</label>
+                            @Html.TextBox("email", "", null, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-4 mb-2">
+                <div class="col-md-3 col-8 my-auto">
+                    <div class="h-100">
+                        <div class="@GetInputGroupClass("memberId")">
+                            <label class="form-label">Member ID</label>
+                            @Html.TextBox("memberId", "", null, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row gx-4 mb-2">
+                <div class="col-12 my-auto">
+                    <ul class="list-group">
+                        <li class="list-group-item border-0 px-0">
+                            <div class="form-check form-switch ps-0">
+                                @Html.CheckBox("admin", null, new { @class = "form-check-input ms-auto"})
+                                <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0"
+                                    for="flexSwitchCheckDefault">Administrator</label>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <a class="btn btn-icon btn-3 btn-secondary mx-1" asp-action="Index">
+                        <span class="btn-inner--text">Cancel</span>
+                    </a>
+                    <button class="btn btn-icon btn-3 btn-success mx-1" type="submit" id="btnSave">
+                        <span class="btn-inner--text">Save</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        function submitting() {
+            var saveButton = document.getElementById("btnSave");
+            saveButton.disabled = true;
+            saveButton.innerHTML =
+                "Saving &nbsp; <span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>";
+        }
+    </script>
+}
