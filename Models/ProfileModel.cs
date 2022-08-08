@@ -76,7 +76,7 @@ public class ApplicationUserModel
 {
     public string ApplicationId { get; set; } = "";
     public string ApplicationName { get; set; } = "";
-    public Dictionary<string, string> Profile { get; } = new();
+    public Dictionary<string, object> Profile { get; } = new();
 }
 
 public class ApplicationModel
@@ -91,4 +91,6 @@ public class ApplicationProfilePropertyModel
     public string Id { get; set; } = "";
     public string DisplayName { get; set; } = "";
     public string Type { get; set; } = "";
+
+    public bool isArray { get; set; } = false;
 }

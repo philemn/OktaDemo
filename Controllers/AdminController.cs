@@ -41,7 +41,29 @@ public class AdminController : Controller
 
                 var applicationUserSchema = await _client.UserSchemas.GetApplicationUserSchemaAsync(application.Id);
                 var customSchema = applicationUserSchema.Definitions.Custom;
+                    
+                model.Properties.Add(new ApplicationProfilePropertyModel
+                {
+                    DisplayName = "User Name",
+                    Id = "userName",
+                    isArray = false
+                });
 
+                //I want the base properties from OIN apps.
+                //Application name starts with the Okta tenant name, or oidc_client, and it's custom.
+                if(application.Name != "oidc_client" && !application.Name.StartsWith("zimtco")) {
+                    foreach (var property in applicationUserSchema.Definitions.Base.Properties.GetData()) {
+                        var data = (IEnumerable<KeyValuePair<string, object>>)property.Value;
+                        var dict = new Dictionary<string, object>(data);
+
+                        model.Properties.Add(new ApplicationProfilePropertyModel
+                        {
+                            DisplayName = (string)dict["title"],
+                            Id = property.Key,
+                            isArray = ((string)dict["type"]).Contains("array")
+                        });
+                    }
+                }
                 foreach (var property in customSchema.Properties.GetData())
                 {
                     var data = (IEnumerable<KeyValuePair<string, object>>)property.Value;
@@ -50,7 +72,8 @@ public class AdminController : Controller
                     model.Properties.Add(new ApplicationProfilePropertyModel
                     {
                         DisplayName = (string)dict["title"],
-                        Id = property.Key
+                        Id = property.Key,
+                        isArray = ((string)dict["type"]).Contains("array")
                     });
                 }
 
@@ -102,10 +125,18 @@ public class AdminController : Controller
 
             foreach (var property in application.Properties)
             {
-                var value = appUser.Profile.GetProperty<string>(property.Id);
+                object value;
+                if(property.isArray) {
+                    value = appUser.Profile.GetArrayProperty<string>(property.Id);
+                }
+                else if (property.Id == "userName") {
+                    value = appUser.Credentials.UserName;
+                }
+                else {
+                    value = appUser.Profile.GetProperty<string>(property.Id);
+                } 
                 appUserModel.Profile.Add(property.DisplayName, value);
             }
-
             model.Applications.Add(appUserModel);
         }
 

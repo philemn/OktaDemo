@@ -37,12 +37,12 @@
                 <div class="col-12 col-xl-4">
                     <div class="card card-plain h-100">
                         <div class="card-header pb-0 p-3">
-                            <h6 class="mb-0" style="border-bottom: 1px solid #999;">Global</h6>
+                            <h6 class="mb-0" style="border-bottom: 1px solid #999;">Global Okta Profile</h6>
                         </div>
                         <div class="card-body p-3">
                             <ul class="list-group">
                                 <li class="list-group-item border-0 ps-0 text-sm"><strong
-                                    class="text-dark">ID:</strong> &nbsp;
+                                    class="text-dark">Global Unique ID:</strong> &nbsp;
                                     <span>
                                     @(Model.Id)
                                     </span>
@@ -98,18 +98,31 @@
                     @foreach (var application in Model.Applications)
                     {
                         <div class="card-header pb-0 p-3">
-                            <h6 class="mb-0" style="border-bottom: 1px solid #999;">@(application.ApplicationName)</h6>
+                            <h6 class="mb-0" style="border-bottom: 1px solid #999;">@(application.ApplicationName) Profile</h6>
                         </div>
                         <div class="card-body p-3">
                             <ul class="list-group">
                                 @foreach (var attribute in application.Profile)
                                 {
-                                    <li class="list-group-item border-0 ps-0 text-sm"><strong
-                                        class="text-dark">@(attribute.Key):</strong> &nbsp;
-                                        <span>
-                                        @(attribute.Value)
-                                        </span>
-                                    </li>
+                                    @if (attribute.Value != null && typeof(IEnumerable<object>).IsAssignableFrom(attribute.Value.GetType())) {
+                                        <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                            class="text-dark">@(attribute.Key):</strong> &nbsp;
+                                            <ul class="list-group">
+                                                @foreach (var item in (IEnumerable<object>)attribute.Value) {
+                                                    <li class="list-group-item border-0 ps-0 text-sm">@(item)</li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                    else {
+                                        <li class="list-group-item border-0 ps-0 text-sm"><strong
+                                            class="text-dark">@(attribute.Key):</strong> &nbsp;
+                                            <span>
+                                            @(attribute.Value)
+                                            </span>
+                                        </li>
+                                    }
+
                                 }
                             </ul>
                         </div>
