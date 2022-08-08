@@ -92,5 +92,5 @@ public class ApplicationProfilePropertyModel
     public string DisplayName { get; set; } = "";
     public string Type { get; set; } = "";
 
-    public bool isArray { get; set; } = false;
+    public bool IsArray { get; set; } = false;
 }

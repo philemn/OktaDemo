@@ -10,6 +10,8 @@ namespace OktaDemo.Controllers;
 public class AdminController : Controller
 {
     private static IList<ApplicationModel>? Applications;
+    private readonly string[] _oktaApplications;
+    private readonly string[] _fullProfileOktaApplications;
     private readonly string _adminGroupId;
 
 
@@ -20,6 +22,8 @@ public class AdminController : Controller
     {
         _client = oktaClient;
         _adminGroupId = appTemplate.AdminGroupId;
+        _oktaApplications = appTemplate.OktaApplications;
+        _fullProfileOktaApplications = appTemplate.FullProfileOktaApplications;
         _logger = logger;
     }
 
@@ -30,8 +34,9 @@ public class AdminController : Controller
             var applications = new List<ApplicationModel>();
             foreach (var application in await _client.Applications.ListApplications().ToListAsync())
             {
-                if (application.Label.StartsWith("Okta "))
+                if (!_oktaApplications.Contains(application.Label))
                 {
+                    Console.WriteLine($"Skipping application '{application.Label}'");
                     continue;
                 }
 
@@ -46,12 +51,11 @@ public class AdminController : Controller
                 {
                     DisplayName = "User Name",
                     Id = "userName",
-                    isArray = false
+                    IsArray = false
                 });
 
-                //I want the base properties from OIN apps.
-                //Application name starts with the Okta tenant name, or oidc_client, and it's custom.
-                if(application.Name != "oidc_client" && !application.Name.StartsWith("zimtco")) {
+                // Display base properties from "Full Profile" applications
+                if (_fullProfileOktaApplications.Contains(application.Label)) {
                     foreach (var property in applicationUserSchema.Definitions.Base.Properties.GetData()) {
                         var data = (IEnumerable<KeyValuePair<string, object>>)property.Value;
                         var dict = new Dictionary<string, object>(data);
@@ -60,7 +64,7 @@ public class AdminController : Controller
                         {
                             DisplayName = (string)dict["title"],
                             Id = property.Key,
-                            isArray = ((string)dict["type"]).Contains("array")
+                            IsArray = ((string)dict["type"]).Contains("array")
                         });
                     }
                 }
@@ -73,7 +77,7 @@ public class AdminController : Controller
                     {
                         DisplayName = (string)dict["title"],
                         Id = property.Key,
-                        isArray = ((string)dict["type"]).Contains("array")
+                        IsArray = ((string)dict["type"]).Contains("array")
                     });
                 }
 
@@ -126,7 +130,7 @@ public class AdminController : Controller
             foreach (var property in application.Properties)
             {
                 object value;
-                if(property.isArray) {
+                if (property.IsArray) {
                     value = appUser.Profile.GetArrayProperty<string>(property.Id);
                 }
                 else if (property.Id == "userName") {
