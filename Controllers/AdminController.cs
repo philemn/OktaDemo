@@ -10,6 +10,8 @@ namespace OktaDemo.Controllers;
 public class AdminController : Controller
 {
     private static IList<ApplicationModel>? Applications;
+    private readonly string[] _oktaApplications;
+    private readonly string[] _fullProfileOktaApplications;
     private readonly string _adminGroupId;
 
 
@@ -20,6 +22,8 @@ public class AdminController : Controller
     {
         _client = oktaClient;
         _adminGroupId = appTemplate.AdminGroupId;
+        _oktaApplications = appTemplate.OktaApplications;
+        _fullProfileOktaApplications = appTemplate.FullProfileOktaApplications;
         _logger = logger;
     }
 
@@ -30,8 +34,9 @@ public class AdminController : Controller
             var applications = new List<ApplicationModel>();
             foreach (var application in await _client.Applications.ListApplications().ToListAsync())
             {
-                if (application.Label.StartsWith("Okta "))
+                if (!_oktaApplications.Contains(application.Label))
                 {
+                    Console.WriteLine($"Skipping application '{application.Label}'");
                     continue;
                 }
 
@@ -41,7 +46,28 @@ public class AdminController : Controller
 
                 var applicationUserSchema = await _client.UserSchemas.GetApplicationUserSchemaAsync(application.Id);
                 var customSchema = applicationUserSchema.Definitions.Custom;
+                    
+                model.Properties.Add(new ApplicationProfilePropertyModel
+                {
+                    DisplayName = "User Name",
+                    Id = "userName",
+                    IsArray = false
+                });
 
+                // Display base properties from "Full Profile" applications
+                if (_fullProfileOktaApplications.Contains(application.Label)) {
+                    foreach (var property in applicationUserSchema.Definitions.Base.Properties.GetData()) {
+                        var data = (IEnumerable<KeyValuePair<string, object>>)property.Value;
+                        var dict = new Dictionary<string, object>(data);
+
+                        model.Properties.Add(new ApplicationProfilePropertyModel
+                        {
+                            DisplayName = (string)dict["title"],
+                            Id = property.Key,
+                            IsArray = ((string)dict["type"]).Contains("array")
+                        });
+                    }
+                }
                 foreach (var property in customSchema.Properties.GetData())
                 {
                     var data = (IEnumerable<KeyValuePair<string, object>>)property.Value;
@@ -50,7 +76,8 @@ public class AdminController : Controller
                     model.Properties.Add(new ApplicationProfilePropertyModel
                     {
                         DisplayName = (string)dict["title"],
-                        Id = property.Key
+                        Id = property.Key,
+                        IsArray = ((string)dict["type"]).Contains("array")
                     });
                 }
 
@@ -102,10 +129,18 @@ public class AdminController : Controller
 
             foreach (var property in application.Properties)
             {
-                var value = appUser.Profile.GetProperty<string>(property.Id);
+                object value;
+                if (property.IsArray) {
+                    value = appUser.Profile.GetArrayProperty<string>(property.Id);
+                }
+                else if (property.Id == "userName") {
+                    value = appUser.Credentials.UserName;
+                }
+                else {
+                    value = appUser.Profile.GetProperty<string>(property.Id);
+                } 
                 appUserModel.Profile.Add(property.DisplayName, value);
             }
-
             model.Applications.Add(appUserModel);
         }
 

@@ -14,7 +14,13 @@ Add a file named `appsettings.Development.json` to the root directory.  Replace 
   "Template": {
     "ApplicationName": "<YOUR APPLICATION NAME>",
     "Presenter": "<YOUR NAME>",
-    "AdminGroupId": "<ID OF THE GROUP ID FOR ADMINS | optional>"
+    "AdminGroupId": "<ID OF THE GROUP ID FOR ADMINS | optional>",
+    "OktaApplications": [
+      <... list of application names ...>
+    ],
+    "FullProfileOktaApplications": [
+      <... list of application names ...>
+    ]
   },
   "Okta": {
     "OktaDomain": "https://<TENANT NAME>.okta.com",
